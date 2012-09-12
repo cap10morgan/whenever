@@ -66,33 +66,23 @@ module Whenever
     end
 
     def write_crontab(contents)
-      tmp_cron_file = Tempfile.new('whenever_tmp_cron').path
-      puts "Tempfile: #{tmp_cron_file}"
-      puts "Tempfile exists" if File.exists?(tmp_cron_file)
-      File.open(tmp_cron_file, File::WRONLY | File::APPEND) do |file|
-        file << contents
-      end
-      puts "Tempfile exists after writing contents" if File.exists?(tmp_cron_file)
+      tmp_cron_file = Tempfile.open('whenever_tmp_cron', Dir.tmpdir,
+                                    File::WRONLY | File::APPEND)
+      tmp_cron_file << contents
 
       command = ['crontab']
       command << "-u #{@options[:user]}" if @options[:user]
-      command << tmp_cron_file
-      puts "Tempfile exists after creating command" if File.exists?(tmp_cron_file)
+      command << tmp_cron_file.path
 
-      puts "Running command #{command.join(' ')}"
-      sleep 30 # give me a chance to inspect the tmp file
       if system(command.join(' '))
         action = 'written' if @options[:write]
         action = 'updated' if @options[:update]
         puts "[write] crontab file #{action}"
+        tmp_cron_file.close!
         exit(0)
       else
         warn "[fail] Couldn't write crontab; try running `whenever' with no options to ensure your schedule file is valid."
-        if File.exists?(tmp_cron_file)
-          puts "Tempfile exists after running command"
-        else
-          puts "Tempfile DOES NOT exist after running command"
-        end
+        tmp_cron_file.close!
         exit(1)
       end
     end
