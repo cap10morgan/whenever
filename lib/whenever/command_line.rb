@@ -88,12 +88,12 @@ module Whenever
         exit(0)
       else
         warn "[fail] Couldn't write crontab; try running `whenever' with no options to ensure your schedule file is valid."
+        if File.exists?(tmp_cron_file)
+          puts "Tempfile exists after running command"
+        else
+          puts "Tempfile DOES NOT exist after running command"
+        end
         exit(1)
-      end
-      if File.exists?(tmp_cron_file)
-        puts "Tempfile exists after running command"
-      else
-        puts "Tempfile DOES NOT exist after running command"
       end
     end
 
