@@ -67,14 +67,19 @@ module Whenever
 
     def write_crontab(contents)
       tmp_cron_file = Tempfile.new('whenever_tmp_cron').path
+      puts "Tempfile: #{tmp_cron_file}"
+      puts "Tempfile exists" if File.exists?(tmp_cron_file)
       File.open(tmp_cron_file, File::WRONLY | File::APPEND) do |file|
         file << contents
       end
+      puts "Tempfile exists after writing contents" if File.exists?(tmp_cron_file)
 
       command = ['crontab']
       command << "-u #{@options[:user]}" if @options[:user]
       command << tmp_cron_file
+      puts "Tempfile exists after creating command" if File.exists?(tmp_cron_file)
 
+      puts "Running command #{command}"
       if system(command.join(' '))
         action = 'written' if @options[:write]
         action = 'updated' if @options[:update]
