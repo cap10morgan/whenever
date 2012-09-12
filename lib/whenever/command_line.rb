@@ -66,9 +66,9 @@ module Whenever
     end
 
     def write_crontab(contents)
-      tmp_cron_file = Tempfile.open('whenever_tmp_cron', Dir.tmpdir,
-                                    File::WRONLY | File::APPEND)
+      tmp_cron_file = Tempfile.open('whenever_tmp_cron')
       tmp_cron_file << contents
+      tmp_cron_file.fsync
 
       command = ['crontab']
       command << "-u #{@options[:user]}" if @options[:user]
