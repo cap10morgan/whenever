@@ -79,7 +79,8 @@ module Whenever
       command << tmp_cron_file
       puts "Tempfile exists after creating command" if File.exists?(tmp_cron_file)
 
-      puts "Running command #{command}"
+      puts "Running command #{command.join(' ')}"
+      sleep 5 # see if this is some kind of race condition
       if system(command.join(' '))
         action = 'written' if @options[:write]
         action = 'updated' if @options[:update]
