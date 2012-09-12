@@ -80,7 +80,7 @@ module Whenever
       puts "Tempfile exists after creating command" if File.exists?(tmp_cron_file)
 
       puts "Running command #{command.join(' ')}"
-      sleep 5 # see if this is some kind of race condition
+      sleep 30 # give me a chance to inspect the tmp file
       if system(command.join(' '))
         action = 'written' if @options[:write]
         action = 'updated' if @options[:update]
@@ -89,6 +89,11 @@ module Whenever
       else
         warn "[fail] Couldn't write crontab; try running `whenever' with no options to ensure your schedule file is valid."
         exit(1)
+      end
+      if File.exists?(tmp_cron_file)
+        puts "Tempfile exists after running command"
+      else
+        puts "Tempfile DOES NOT exist after running command"
       end
     end
 
