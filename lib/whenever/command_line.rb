@@ -74,17 +74,17 @@ module Whenever
       command << "-u #{@options[:user]}" if @options[:user]
       command << tmp_cron_file.path
 
+      exit_code = 0
       if system(command.join(' '))
         action = 'written' if @options[:write]
         action = 'updated' if @options[:update]
         puts "[write] crontab file #{action}"
-        tmp_cron_file.close!
-        exit(0)
       else
         warn "[fail] Couldn't write crontab; try running `whenever' with no options to ensure your schedule file is valid."
-        tmp_cron_file.close!
-        exit(1)
+        exit_code = 1
       end
+      tmp_cron_file.close!
+      exit(exit_code)
     end
 
     def updated_crontab
